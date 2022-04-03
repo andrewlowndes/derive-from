@@ -1,0 +1,18 @@
+[package]
+name = "derive-from"
+version = "0.1.0"
+edition = "2021"
+description = "Derive macro implementing 'From' for structs"
+repository = "https://github.com/andrewlowndes/derive-from"
+license = "MIT OR Apache-2.0"
+keywords = ["derive", "from", "macro"]
+categories = ["rust-patterns"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = { version = "1.0", features = ["full"] }
+syn-unnamed-struct = "0.1"
