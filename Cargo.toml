@@ -1,5 +1,5 @@
 [package]
-name = "derive-from"
+name = "derive-from-ext"
 version = "0.1.0"
 edition = "2021"
 description = "Derive macro implementing 'From' for structs"

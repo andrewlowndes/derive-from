@@ -1,5 +1,12 @@
-# derive-from
+# derive-from-ext
 A derive macro that auto implements 'std::convert::From' for structs. The default behaviour is to create an instance of the structure by calling .into() on each of the source structure properties. The source struct properties can be mapped using different names and methods by using field attributes to override the default behaviour.
+
+## Installing
+Include in your Cargo.toml file:
+```toml
+[dependencies]
+derive-from-ext = 0.1
+```
 
 ## Examples
 ```rust
@@ -71,3 +78,6 @@ struct C {
     other_prop: String,
 }
 ```
+
+## Alternatives
+If you do not require the features above and only want to convert a struct into matching struct you may be better off using [derive_more](https://github.com/JelteF/derive_more) instead.
