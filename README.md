@@ -5,16 +5,18 @@ A derive macro that auto implements 'std::convert::From' for structs. The defaul
 Include in your Cargo.toml file:
 ```toml
 [dependencies]
-derive-from-ext = 0.1
+derive-from-ext = "0.1"
 ```
 
 ## Examples
 ```rust
+use derive_from_ext::From;
+
 struct A {
     prop1: String,
 }
 
-#[derive(From)]
+#[derive(From, Debug)]
 #[from(A)]
 struct B {
     prop1: String,
