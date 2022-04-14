@@ -8,7 +8,7 @@ use syn_unnamed_struct::{Meta, MetaValue, NestedMeta};
 const INTO_METHOD: &str = "core::convert::Into::into";
 const SKIP_METHOD: &str = "core::default::Default::default()";
 
-#[derive(Debug, Default)]
+#[derive(Default)]
 struct FieldOverridesArgs {
     pub map: Option<String>,
     pub rename: Option<String>,
@@ -16,13 +16,13 @@ struct FieldOverridesArgs {
     pub default: Option<String>,
 }
 
-#[derive(Debug, Default)]
+#[derive(Default)]
 struct FieldArgs {
     pub map: Option<String>,
     pub rename: Option<String>,
     pub skip: bool,
     pub default: Option<String>,
-    pub overrides: HashMap<Ident, FieldOverridesArgs>,
+    pub overrides: HashMap<String, FieldOverridesArgs>,
 }
 
 fn extract_meta_str(expr: &MetaValue) -> String {
@@ -107,8 +107,8 @@ pub fn derive(input: TokenStream) -> TokenStream {
     let type_names = attrs.iter().filter(|a| a.path.is_ident("from")).flat_map(|attr| {
         attr.parse_args_with(Punctuated::<Path, Token![,]>::parse_terminated).expect("Could not parse 'from' attribute")
     }).map(|path| {
-        path.get_ident().unwrap().clone()
-    }).collect::<Vec<_>>();
+        (path.to_token_stream().to_string(), path)
+    }).collect::<HashMap<String, Path>>();
 
     let obj = match data {
         syn::Data::Struct(obj) => obj,
@@ -154,9 +154,9 @@ pub fn derive(input: TokenStream) -> TokenStream {
                                             NestedMeta::Meta(meta) => {
                                                 match meta {
                                                     Meta::NameValue(pair) => {
-                                                        let field_name = pair.path.get_inner().get_ident().unwrap().clone();
+                                                        let field_name = pair.path.get_inner().to_token_stream().to_string();
         
-                                                        if !type_names.contains(&field_name) {
+                                                        if !type_names.contains_key(&field_name) {
                                                             panic!("Type does not exist for override: {}", field_name);
                                                         }
 
@@ -186,7 +186,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
     //determine how each field will map
     let mut output = proc_macro2::TokenStream::new();
 
-    for type_name in type_names {
+    for (type_str, type_name) in type_names {
         let fields = field_objs.iter().map(|(field_name, field_obj)| {
             let mut map = field_obj.map.clone();
             let mut rename = field_obj.rename.clone();
@@ -194,7 +194,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
             let mut default = field_obj.default.clone();
 
             //override type-specific and field-specific settings
-            if let Some(type_override) = field_obj.overrides.get(&type_name) {
+            if let Some(type_override) = field_obj.overrides.get(&type_str) {
                 if type_override.map.is_some() {
                     map = type_override.map.clone();
                 }
