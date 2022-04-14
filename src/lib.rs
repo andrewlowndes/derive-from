@@ -104,7 +104,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
     let DeriveInput { ident, attrs, data, .. } = &input;
 
     //fetch all of the types from the struct attribute macros
-    let type_names = attrs.iter().flat_map(|attr| {
+    let type_names = attrs.iter().filter(|a| a.path.is_ident("from")).flat_map(|attr| {
         attr.parse_args_with(Punctuated::<Path, Token![,]>::parse_terminated).expect("Could not parse 'from' attribute")
     }).map(|path| {
         path.get_ident().unwrap().clone()
@@ -120,7 +120,7 @@ pub fn derive(input: TokenStream) -> TokenStream {
         let field_name = field.ident.as_ref().expect("Structs must contain named fields").clone();
         let mut props = FieldArgs::default();
 
-        field.attrs.iter().flat_map(|attr| {
+        field.attrs.iter().filter(|a| a.path.is_ident("from")).flat_map(|attr| {
             attr.parse_args_with(<Punctuated<Meta, Token![,]>>::parse_terminated).expect("Could not parse 'from' attribute")
         }).for_each(|meta| {
             match meta {
