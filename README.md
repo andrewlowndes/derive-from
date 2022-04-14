@@ -5,7 +5,7 @@ A derive macro that auto implements 'std::convert::From' for structs. The defaul
 Include in your Cargo.toml file:
 ```toml
 [dependencies]
-derive-from-ext = "0.1"
+derive-from-ext = "0.2"
 ```
 
 ## Examples
